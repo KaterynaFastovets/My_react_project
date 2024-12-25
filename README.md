@@ -17,7 +17,7 @@ ___
 **2. Steps:**
 
 + Clone the repository:
-+ 
+  
 `git clone <repository-url>`
 
 `cd <repository-folder>`
