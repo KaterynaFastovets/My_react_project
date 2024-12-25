@@ -36,11 +36,11 @@ The backend will be available at http://localhost:3002.
 
 Create an *.env* file in the root directory of the project and set the necessary variables:
 
-`SECRET_KEY=your_secret_key`
+`MONGO_DB_KEY=user_secret_key`
 
-`NODE_ENV=development`
+`MONGO_DB_USER=user_name`
 
-`MONGO_DB=your_database_name`
+`MONGO_DB_SERVER_NAME=user_database_name`
 
 `PORT=3002`
 
