@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-export const ProductCard = ({ product, onDelete }) => {
+export const ProductCard = ({ product, onDelete, onEdit }) => {
   const [showPopup, setShowPopup] = useState(false);
-  const [loading, setLoading] = useState(false); 
-  const [error, setError] = useState(null); 
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleDelete = async () => {
     try {
@@ -15,21 +14,26 @@ export const ProductCard = ({ product, onDelete }) => {
       }
 
       setLoading(true);
-      setError(null); 
-      await onDelete(product._id); 
-      setShowPopup(false); 
+      setError(null);
+      await onDelete(product._id);
+      setShowPopup(false);
     } catch (err) {
       setError("Помилка при видаленні товару. Спробуйте ще раз.");
       console.error("Помилка при видаленні товару:", err);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
   return (
     <div className="relative flex flex-col gap-4 rounded-lg p-4 shadow-lg hover:shadow-xl transition-shadow w-80 bg-white">
-      <Link to={`/${product._id}`} className="flex flex-col flex-grow rounded-sm">
-        <div className={product.imgUrl ? "h-64 border" : "h-64 border bg-gray-300"}>
+      <Link
+        to={`/${product._id}`}
+        className="flex flex-col flex-grow rounded-sm"
+      >
+        <div
+          className={product.imgUrl ? "h-64 border" : "h-64 border bg-gray-300"}
+        >
           {product.imgUrl ? (
             <img
               src={`http://localhost:3002/${product.imgUrl}`}
@@ -44,19 +48,31 @@ export const ProductCard = ({ product, onDelete }) => {
         </div>
         <div className="text-gray-800 mt-2 text-xl font-semibold">
           {product.productName}
-          <p className="text-gray-600 text-xs pt-4 mt-2 opacity-70">{product.text}</p>
+          <p className="text-gray-600 text-xs pt-4 mt-2 opacity-70">
+            {product.text}
+          </p>
           <p className="text-gray-800 text-xl mt-2">{product.price} грн</p>
         </div>
       </Link>
+      <div className=" bottom-2 left-2 right-2 flex justify-between">
+        {/* Edit Button */}
+        <button
+          onClick={() => onEdit(product)} 
+          className="text-blue-500 text-2xl"
+          aria-label="Редагувати товар"
+        >
+          ✎ 
+        </button>
 
-      {/* Delete Button */}
-      <button
-        onClick={() => setShowPopup(true)} 
-        className="absolute top-2 right-2 text-red-500 text-2xl"
-        aria-label="Видалити товар"
-      >
-        &#10005; {/* X icon */}
-      </button>
+        {/* Delete Button */}
+        <button
+          onClick={() => setShowPopup(true)}
+          className="text-red-500 text-2xl"
+          aria-label="Видалити товар"
+        >
+          &#10005; 
+        </button>
+      </div>
 
       {/* Popup */}
       {showPopup && (
@@ -66,19 +82,21 @@ export const ProductCard = ({ product, onDelete }) => {
           }`}
         >
           <div className="popup-content bg-white p-6 rounded-lg shadow-lg w-96">
-            <h3 className="text-lg font-semibold text-gray-700">Ви впевнені, що хочете видалити цей товар?</h3>
+            <h3 className="text-lg font-semibold text-gray-700">
+              Ви впевнені, що хочете видалити цей товар?
+            </h3>
             <div className="flex justify-around mt-4">
               <button
                 onClick={handleDelete}
-                className="bg-red-600 text-white px-4 py-2 rounded-md w-24"
+                className="bg-emerald-600 text-white px-4 py-2 rounded-md w-24"
                 aria-label="Підтвердити видалення"
                 disabled={loading}
               >
-                {loading ? "Зачекайте..." : "Так"} 
+                {loading ? "Зачекайте..." : "Так"}
               </button>
               <button
-                onClick={() => setShowPopup(false)} 
-                className="bg-gray-600 text-white px-4 py-2 rounded-md w-24"
+                onClick={() => setShowPopup(false)}
+                className="bg-red-600 text-white px-4 py-2 rounded-md w-24"
                 aria-label="Скасувати видалення"
               >
                 Ні

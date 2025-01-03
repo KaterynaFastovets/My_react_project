@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "../../../utils/axios"; 
+import axios from "../../../utils/axios";
 
 const initialState = {
   products: [],
@@ -13,9 +13,9 @@ export const createProduct = createAsyncThunk(
   async (params, { rejectWithValue }) => {
     try {
       const { data } = await axios.post(`/products`, params);
-      return data; 
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response.data); 
+      return rejectWithValue(error.response.data);
     }
   }
 );
@@ -26,22 +26,45 @@ export const getAllProduct = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await axios.get(`/products`);
-      return data.products; 
+      return data.products;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
 
+// Update Product
+export const updateProduct = createAsyncThunk(
+  "product/updateProduct",
+  async ({ id, updatedData }, { rejectWithValue }) => {
+    try {
+      console.log("Updating product with ID:", id);
+      console.log("Updated data:", updatedData);
+
+      if (!id) {
+        return rejectWithValue("Product ID is missing.");
+      }
+      const { data } = await axios.put(`/products/${id}`, updatedData);
+
+      return data; 
+    } catch (error) {
+      console.error("Error updating product:", error);
+      return rejectWithValue(
+        error.response?.data || "Failed to update product"
+      );
+    }
+  }
+);
+
+
 // Delete Product
 export const deleteProduct = createAsyncThunk(
   "product/deleteProduct",
-  async (id, { rejectWithValue }) => {
+  async (_id, { rejectWithValue }) => {
     try {
-      const { data } = await axios.delete(`/products/${id}`);
-      return { data }; 
+      await axios.delete(`/products/${_id}`);
+      return _id; 
     } catch (error) {
-      console.log(error);
       return rejectWithValue(
         error.response?.data || "Failed to delete product"
       );
@@ -54,21 +77,21 @@ const productSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+
     // Create Product
     builder.addCase(createProduct.pending, (state) => {
       state.loading = true;
     });
     builder.addCase(createProduct.fulfilled, (state, action) => {
       state.loading = false;
-      if (state.products) {
-        state.products.push(action.payload); 
-      } else {
-        state.products = [action.payload]; 
+      if (!state.products) {
+        state.products = [];
       }
+      state.products.push(action.payload);
     });
     builder.addCase(createProduct.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload; 
+      state.error = action.payload;
     });
 
     // Get All Products
@@ -77,11 +100,31 @@ const productSlice = createSlice({
     });
     builder.addCase(getAllProduct.fulfilled, (state, action) => {
       state.loading = false;
-      state.products = action.payload; 
+      state.products = action.payload;
     });
     builder.addCase(getAllProduct.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload; 
+      state.error = action.payload;
+    });
+
+    // Update Product
+    builder.addCase(updateProduct.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(updateProduct.fulfilled, (state, action) => {
+      state.loading = false;
+
+      const index = state.products.findIndex(
+        (product) => product._id === action.payload._id
+      );
+
+      if (index !== -1) {
+        state.products[index] = action.payload;
+      }
+    });
+    builder.addCase(updateProduct.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload || "Failed to update product";
     });
 
     // Delete Product
@@ -90,10 +133,10 @@ const productSlice = createSlice({
     });
     builder.addCase(deleteProduct.fulfilled, (state, action) => {
       state.loading = false;
-      
+
       if (state.products) {
         state.products = state.products.filter(
-          (product) => product._id !== action.payload.id
+          (product) => product._id !== action.payload 
         );
       }
     });

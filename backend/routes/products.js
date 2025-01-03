@@ -3,7 +3,8 @@ import {
   createProduct,
   getAllProduct,
   deleteProduct,
-} from "../controllers/product.js"; 
+  updateProduct,
+} from "../controllers/product.js";
 
 const router = new Router();
 
@@ -18,5 +19,9 @@ router.get("/", getAllProduct);
 // Delete product by ID
 // DELETE http://localhost:3002/api/products/:id
 router.delete("/:id", deleteProduct);
+
+// Update product by ID
+// PUT http://localhost:3002/api/products/:id
+router.put("/:id", updateProduct);
 
 export default router;
